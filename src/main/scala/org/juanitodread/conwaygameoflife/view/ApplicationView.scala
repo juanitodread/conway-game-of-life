@@ -34,10 +34,14 @@ import scala.swing.event._
  */
 class ApplicationView extends SimpleSwingApplication {
   
-  val titleApp = "Conway's Game of Life"
+  val titleApp = "Conway's Game of Life :: juanitodread :: 2015"
   
-  val xAxis = 50
+  val xAxis = 10
   
+  val generations = 10
+
+  val seconds = 1000 * 1
+
   val gridCell = Array.tabulate[ToggleButton](xAxis, xAxis){
     (x, y) => new ToggleButton{
       name = s"$x:$y"
@@ -50,9 +54,12 @@ class ApplicationView extends SimpleSwingApplication {
   
   val gridPanel = new GridPanel(xAxis, xAxis) {
     println("Start grid layout")
-    for(row <- gridCellRows; elem <- row) {
-      contents += elem
+    for(x <- 0 until xAxis; y <- 0 until xAxis) {
+      contents += gridCell(x)(y)
     }
+    //for(row <- gridCellRows; elem <- row) {
+    //  contents += elem
+    //}
   }
   
   val leftPanel = new BoxPanel(Orientation.Vertical) {
@@ -92,6 +99,34 @@ class ApplicationView extends SimpleSwingApplication {
     layout(leftPanel) = West
   }
 
+  def mod(x: Int, m: Int): Int = {
+    val mod = (x %  m + m) % m
+    mod
+  }
+
+  def getNeighborCount(x: Int, y: Int): Int = {
+    var neighborCount = 0
+    val xSize = xAxis
+    val ySize = xAxis
+
+    if(gridCell(mod(x + 1, xSize))(y).selected)                 {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x + 1, xSize))(mod(y + 1, ySize)).selected) {neighborCount = neighborCount + 1}
+    if(gridCell(x)(mod(y + 1, ySize)).selected)                 {neighborCount = neighborCount + 1}
+    if(gridCell(x)(mod(y - 1, ySize)).selected)                 {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x + 1, xSize))(mod(y - 1, ySize)).selected) {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x - 1, xSize))(y).selected)                 {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x - 1, xSize))(mod(y - 1, xSize)).selected) {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x - 1, xSize))(mod(y + 1, xSize)).selected) {neighborCount = neighborCount + 1}
+
+    neighborCount
+  }
+
+  def getState(x: Int, y: Int): Boolean = {
+    val isAlive = gridCell(x)(y).selected && getNeighborCount(x, y) == 2 || getNeighborCount(x,y) == 3
+    println(s"Grid [${x},${y}]: ${isAlive}")
+    isAlive
+  }
+
   def top = new MainFrame {
     title = titleApp
     
@@ -105,6 +140,14 @@ class ApplicationView extends SimpleSwingApplication {
     reactions += {
       case ButtonClicked(component) if component == leftPanel.start => {
         println("Start clicked")
+        //for(i <- 1 to generations) {
+            //println("Generation")
+            for(x <- 0 until xAxis; y <- 0 until xAxis) {
+              gridCell(x)(y).selected = getState(x, y)
+            }
+            //top.peer.repaint()
+            //Thread.sleep(seconds);      
+        //}
       }
       case ButtonClicked(component) if component == leftPanel.clear => {
         println("Clear clicked")
