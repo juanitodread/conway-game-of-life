@@ -100,7 +100,8 @@ class ApplicationView extends SimpleSwingApplication {
   }
 
   def mod(x: Int, m: Int): Int = {
-    val mod = (x %  m + m) % m
+    val absoluteM = m.abs
+    val mod = (x %  absoluteM + absoluteM) % absoluteM
     mod
   }
 
@@ -115,8 +116,8 @@ class ApplicationView extends SimpleSwingApplication {
     if(gridCell(x)(mod(y - 1, ySize)).selected)                 {neighborCount = neighborCount + 1}
     if(gridCell(mod(x + 1, xSize))(mod(y - 1, ySize)).selected) {neighborCount = neighborCount + 1}
     if(gridCell(mod(x - 1, xSize))(y).selected)                 {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x - 1, xSize))(mod(y - 1, xSize)).selected) {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x - 1, xSize))(mod(y + 1, xSize)).selected) {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x - 1, xSize))(mod(y - 1, ySize)).selected) {neighborCount = neighborCount + 1}
+    if(gridCell(mod(x - 1, xSize))(mod(y + 1, ySize)).selected) {neighborCount = neighborCount + 1}
 
     neighborCount
   }
