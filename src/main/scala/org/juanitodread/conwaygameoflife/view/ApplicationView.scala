@@ -18,13 +18,13 @@
  */
 package org.juanitodread.conwaygameoflife.view
 
+import javax.swing.SwingUtilities
 import scala.swing._
 import scala.swing.BorderPanel.Position._
-import javax.swing.BoxLayout
 import scala.swing.event._
 
 /**
- *
+ * This Frame represents a Conway's game of life interface.
  *
  * @author juanitodread
  * @version $
@@ -36,130 +36,136 @@ class ApplicationView extends SimpleSwingApplication {
   
   val titleApp = "Conway's Game of Life :: juanitodread :: 2015"
   
-  val xAxis = 10
+  val xAxis = 50
   
-  val generations = 10
+  var generations = false
 
-  val seconds = 1000 * 1
+  val seconds = 100 * 1
 
-  val gridCell = Array.tabulate[ToggleButton](xAxis, xAxis){
+  val gridCell = initialGrid
+  
+  def initialGrid() = Array.tabulate[ToggleButton](xAxis, xAxis){
     (x, y) => new ToggleButton{
       name = s"$x:$y"
     }
   }
-  
-  def gridCellRows() = gridCell.iterator.map(_.iterator)
-  
-  println(s"gridCell: $gridCell")
-  
-  val gridPanel = new GridPanel(xAxis, xAxis) {
-    println("Start grid layout")
-    for(x <- 0 until xAxis; y <- 0 until xAxis) {
-      contents += gridCell(x)(y)
+
+  def gridCellRows() = gridCell.iterator.map( _.iterator )
+
+  val gridPanel = new GridPanel( xAxis, xAxis ) {
+    println( "Start grid layout" )
+    for ( x <- 0 until xAxis; 
+          y <- 0 until xAxis ) {
+      contents += gridCell( x )( y )
     }
-    //for(row <- gridCellRows; elem <- row) {
-    //  contents += elem
-    //}
+  }
+
+  val start = new Button {
+    text = "Start"
+  }
+
+  val stop = new Button {
+    text = "Stop"
+  }
+  val clear = new Button {
+    text = "Clear"
   }
   
-  val leftPanel = new BoxPanel(Orientation.Vertical) {
-    val start = new Button{
-      text = "Start"
-    }
-    val clear = new Button{
-      text = "Clear"
-    }
+  val leftPanel = new BoxPanel( Orientation.Vertical ) {
     contents += start
+    contents += stop
     contents += clear
-    
-    listenTo(start)
+
+    listenTo( start )
   }
-  
-  val menu = new MenuBar {
-    contents += new Menu( "A Menu" ) {
-      contents += new MenuItem( "An item" )
-      contents += new MenuItem( Action( "An action item" ) {
-        println( "Action '" + titleApp + "' invoked" )
-      } )
-      contents += new Separator
-      contents += new CheckMenuItem( "Check me" )
-      contents += new CheckMenuItem( "Me too!" )
-      contents += new Separator
-      val a = new RadioMenuItem( "a" )
-      val b = new RadioMenuItem( "b" )
-      val c = new RadioMenuItem( "c" )
-      val mutex = new ButtonGroup( a, b, c )
-      contents ++= mutex.buttons
-    }
-    contents += new Menu( "Empty Menu" )
-  }
-  
+
   val mainLayout = new BorderPanel {
-    layout(gridPanel) = Center
-    layout(leftPanel) = West
+    layout( gridPanel ) = Center
+    layout( leftPanel ) = West
   }
 
-  def mod(x: Int, m: Int): Int = {
+  def mod( x: Int, m: Int ): Int = {
     val absoluteM = m.abs
-    val mod = (x %  absoluteM + absoluteM) % absoluteM
-    mod
+    ( x % absoluteM + absoluteM ) % absoluteM
   }
 
-  def getNeighborCount(x: Int, y: Int): Int = {
+  def getNeighborCount( x: Int, y: Int ): Int = {
     var neighborCount = 0
     val xSize = xAxis
     val ySize = xAxis
 
-    if(gridCell(mod(x + 1, xSize))(y).selected)                 {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x + 1, xSize))(mod(y + 1, ySize)).selected) {neighborCount = neighborCount + 1}
-    if(gridCell(x)(mod(y + 1, ySize)).selected)                 {neighborCount = neighborCount + 1}
-    if(gridCell(x)(mod(y - 1, ySize)).selected)                 {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x + 1, xSize))(mod(y - 1, ySize)).selected) {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x - 1, xSize))(y).selected)                 {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x - 1, xSize))(mod(y - 1, ySize)).selected) {neighborCount = neighborCount + 1}
-    if(gridCell(mod(x - 1, xSize))(mod(y + 1, ySize)).selected) {neighborCount = neighborCount + 1}
+    if ( gridCell( mod( x + 1, xSize ) )( y ).selected )                   { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x + 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
+    if ( gridCell( x )( mod( y + 1, ySize ) ).selected )                   { neighborCount = neighborCount + 1 }
+    if ( gridCell( x )( mod( y - 1, ySize ) ).selected )                   { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x + 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x - 1, xSize ) )( y ).selected )                   { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x - 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x - 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
 
     neighborCount
   }
 
-  def getState(x: Int, y: Int): Boolean = {
-    val isAlive = gridCell(x)(y).selected && getNeighborCount(x, y) == 2 || getNeighborCount(x,y) == 3
-    println(s"Grid [${x},${y}]: ${isAlive}")
-    isAlive
+  def getState( x: Int, y: Int ): Boolean = {
+    gridCell( x )( y ).selected && getNeighborCount( x, y ) == 2 || getNeighborCount( x, y ) == 3
   }
+  
+  val nextGridGeneration = initialGrid
 
   def top = new MainFrame {
     title = titleApp
-    
-    menuBar = menu
-    
+
     contents = mainLayout
-    
-    listenTo(leftPanel.start)
-    listenTo(leftPanel.clear)
+
+    listenTo( start )
+    listenTo( stop )
+    listenTo( clear )
     
     reactions += {
-      case ButtonClicked(component) if component == leftPanel.start => {
-        println("Start clicked")
-        //for(i <- 1 to generations) {
-            //println("Generation")
-            for(x <- 0 until xAxis; y <- 0 until xAxis) {
-              gridCell(x)(y).selected = getState(x, y)
+      case ButtonClicked( component ) if component == start => {
+        println( "Start clicked" )
+        println( Thread.currentThread() )
+        generations = true
+        start.enabled = false
+        clear.enabled = false
+
+        val worker = new Thread( new Runnable {
+          def run() {
+            while ( generations ) {
+              SwingUtilities.invokeLater( new Runnable {
+                def run() {
+                  for ( x <- 0 until xAxis; 
+                        y <- 0 until xAxis ) {
+                    nextGridGeneration( x )( y ).selected = getState( x, y )
+                  }
+                  for ( x <- 0 until xAxis; 
+                        y <- 0 until xAxis ) {
+                    gridCell( x )( y ).selected = nextGridGeneration( x )( y ).selected
+                  }
+                }
+              } )
+              Thread.sleep( seconds )
             }
-            //top.peer.repaint()
-            //Thread.sleep(seconds);      
-        //}
+          }
+        } )
+        worker.start
       }
-      case ButtonClicked(component) if component == leftPanel.clear => {
-        println("Clear clicked")
-        for(row <- gridCellRows; elem <- row
-            if(elem.selected)) {
+      case ButtonClicked( component ) if component == stop => {
+        println( "Stop clicked" )
+        generations = false
+        start.enabled = true
+        clear.enabled = true
+      }
+      case ButtonClicked( component ) if component == clear => {
+        println( "Clear clicked" )
+        for ( row <- gridCellRows; 
+              elem <- row if ( elem.selected ) ) {
           elem.selected = false
         }
       }
     }
-    size = new Dimension(800, 600)
-    preferredSize = new Dimension(800, 600)
+    size = new Dimension( 800, 600 )
+    preferredSize = new Dimension( 800, 600 )
     pack
   }
 }
