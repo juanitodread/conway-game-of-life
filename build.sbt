@@ -1,4 +1,7 @@
 import Dependencies._
+import com.github.retronym.SbtOneJar._
+
+oneJarSettings
 
 lazy val root = (project in file(".")).
 		settings(
