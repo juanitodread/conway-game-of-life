@@ -19,6 +19,7 @@
 package org.juanitodread.conwaygameoflife.view
 
 import javax.swing.SwingUtilities
+import javax.swing._
 import scala.swing._
 import scala.swing.BorderPanel.Position._
 import scala.swing.event._
@@ -33,6 +34,8 @@ import scala.swing.event._
  * Mar 23, 2015
  */
 class ApplicationView extends SimpleSwingApplication {
+  
+  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
   
   val titleApp = "Conway's Game of Life :: juanitodread :: 2015"
   
@@ -113,6 +116,7 @@ class ApplicationView extends SimpleSwingApplication {
   val nextGridGeneration = initialGrid
 
   def top = new MainFrame {
+    println(UIManager.getLookAndFeel())
     title = titleApp
 
     contents = mainLayout
