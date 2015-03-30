@@ -19,7 +19,8 @@
 package org.juanitodread.conwaygameoflife.view
 
 import javax.swing.SwingUtilities
-import javax.swing._
+import javax.swing.UIManager
+
 import scala.swing._
 import scala.swing.BorderPanel.Position._
 import scala.swing.event._
