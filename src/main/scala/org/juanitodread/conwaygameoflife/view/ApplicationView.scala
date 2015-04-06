@@ -24,6 +24,8 @@ import javax.swing.UIManager
 import scala.swing._
 import scala.swing.BorderPanel.Position._
 import scala.swing.event._
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
 /**
  * This Frame represents a Conway's game of life interface.
@@ -129,31 +131,28 @@ class ApplicationView extends SimpleSwingApplication {
     reactions += {
       case ButtonClicked( component ) if component == start => {
         println( "Start clicked" )
-        println( Thread.currentThread() )
+        println( Thread.currentThread )
         generations = true
         start.enabled = false
         clear.enabled = false
 
-        val worker = new Thread( new Runnable {
-          def run() {
-            while ( generations ) {
-              SwingUtilities.invokeLater( new Runnable {
-                def run() {
-                  for ( x <- 0 until xAxis; 
-                        y <- 0 until xAxis ) {
-                    nextGridGeneration( x )( y ).selected = getState( x, y )
-                  }
-                  for ( x <- 0 until xAxis; 
-                        y <- 0 until xAxis ) {
-                    gridCell( x )( y ).selected = nextGridGeneration( x )( y ).selected
-                  }
-                }
-              } )
-              Thread.sleep( seconds )
+        val startFuture: Future[Unit] = future {
+          println( s"Future started: ${Thread.currentThread}" )
+          while ( generations ) {
+            for ( x <- 0 until xAxis; 
+                  y <- 0 until xAxis ) {
+             nextGridGeneration( x )( y ).selected = getState( x, y )
             }
-          }
-        } )
-        worker.start
+            for ( x <- 0 until xAxis; 
+                  y <- 0 until xAxis ) {
+              gridCell( x )( y ).selected = nextGridGeneration( x )( y ).selected
+            }
+            Thread.sleep( seconds )
+          }          
+        }
+        startFuture onSuccess{
+          case u => println( "Future.onSuccess => Start stoped" )
+        }
       }
       case ButtonClicked( component ) if component == stop => {
         println( "Stop clicked" )
