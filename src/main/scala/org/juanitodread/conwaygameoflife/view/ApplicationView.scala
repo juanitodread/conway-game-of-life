@@ -27,18 +27,20 @@ import scala.swing.event._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
+import scala.collection.parallel.mutable.ParArray
+
 /**
  * This Frame represents a Conway's game of life interface.
  *
  * @author juanitodread
- * @version $
- * @since 1.0
+ * @version 1.0.1
+ * @since 1.0.0
  *
  * Mar 23, 2015
  */
 class ApplicationView extends SimpleSwingApplication {
   
-  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+  UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName )
   
   val titleApp = "Conway's Game of Life :: juanitodread :: 2015"
   
@@ -49,14 +51,30 @@ class ApplicationView extends SimpleSwingApplication {
   val seconds = 100 * 1
 
   val gridCell = initialGrid
+
+  var mouseIsPressed = false
   
-  def initialGrid() = Array.tabulate[ToggleButton](xAxis, xAxis){
-    (x, y) => new ToggleButton{
+  def initialGrid( ) = ParArray.tabulate[ToggleButton]( xAxis, xAxis ){
+    (x, y) => new ToggleButton {
       name = s"$x:$y"
+      listenTo( mouse.clicks, mouse.moves )
+      // Add reactions when mouse events occurs
+      reactions += {
+        case e: MousePressed  => 
+          if( SwingUtilities.isLeftMouseButton( e.peer ) ) { mouseIsPressed = true }
+        case e: MouseReleased => 
+          if( SwingUtilities.isLeftMouseButton(e.peer ) )  { mouseIsPressed = false }
+        case e: MouseEntered  => 
+          if( mouseIsPressed ) { selectButton( this ) }
+        case e: MouseExited   => 
+          if( mouseIsPressed ) { selectButton( this ) }
+      }
     }
   }
 
-  def gridCellRows() = gridCell.iterator.map( _.iterator )
+  def selectButton( toggle: ToggleButton ) = toggle.selected = true
+
+  def gridCellRows( ) = gridCell.iterator.map( _.iterator )
 
   val gridPanel = new GridPanel( xAxis, xAxis ) {
     println( "Start grid layout" )
@@ -100,14 +118,37 @@ class ApplicationView extends SimpleSwingApplication {
     val xSize = xAxis
     val ySize = xAxis
 
-    if ( gridCell( mod( x + 1, xSize ) )( y ).selected )                   { neighborCount = neighborCount + 1 }
-    if ( gridCell( mod( x + 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
-    if ( gridCell( x )( mod( y + 1, ySize ) ).selected )                   { neighborCount = neighborCount + 1 }
-    if ( gridCell( x )( mod( y - 1, ySize ) ).selected )                   { neighborCount = neighborCount + 1 }
-    if ( gridCell( mod( x + 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
-    if ( gridCell( mod( x - 1, xSize ) )( y ).selected )                   { neighborCount = neighborCount + 1 }
-    if ( gridCell( mod( x - 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
-    if ( gridCell( mod( x - 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { neighborCount = neighborCount + 1 }
+    if ( gridCell( mod( x + 1, xSize ) )( y ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+
+    if ( gridCell( mod( x + 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( x )( mod( y + 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( x )( mod( y - 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( mod( x + 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( mod( x - 1, xSize ) )( y ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( mod( x - 1, xSize ) )( mod( y - 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
+    
+    if ( gridCell( mod( x - 1, xSize ) )( mod( y + 1, ySize ) ).selected ) { 
+      neighborCount = neighborCount + 1 
+    }
 
     neighborCount
   }
@@ -119,7 +160,7 @@ class ApplicationView extends SimpleSwingApplication {
   val nextGridGeneration = initialGrid
 
   def top = new MainFrame {
-    println(UIManager.getLookAndFeel())
+    println( UIManager.getLookAndFeel )
     title = titleApp
 
     contents = mainLayout
@@ -141,7 +182,7 @@ class ApplicationView extends SimpleSwingApplication {
           while ( generations ) {
             for ( x <- 0 until xAxis; 
                   y <- 0 until xAxis ) {
-             nextGridGeneration( x )( y ).selected = getState( x, y )
+              nextGridGeneration( x )( y ).selected = getState( x, y )
             }
             for ( x <- 0 until xAxis; 
                   y <- 0 until xAxis ) {
@@ -162,9 +203,10 @@ class ApplicationView extends SimpleSwingApplication {
       }
       case ButtonClicked( component ) if component == clear => {
         println( "Clear clicked" )
-        for ( row <- gridCellRows; 
-              elem <- row if ( elem.selected ) ) {
-          elem.selected = false
+        gridCell.foreach { 
+          x => x.foreach { 
+            y => y.selected = false 
+          } 
         }
       }
     }
