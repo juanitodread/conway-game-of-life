@@ -29,62 +29,33 @@ import ExecutionContext.Implicits.global
 
 import scala.collection.parallel.mutable.ParArray
 
+import com.typesafe.scalalogging._
+
 /**
  * This Frame represents a Conway's game of life interface.
  *
  * @author juanitodread
- * @version 1.0.1
+ * @version 1.0.2
  * @since 1.0.0
  *
  * Mar 23, 2015
  */
-class ApplicationView extends SimpleSwingApplication {
+class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
 
-  val titleApp = "Conway's Game of Life :: juanitodread :: 2015"
-
-  val xAxis = 50
-
-  var generations = false
-
-  val seconds = 100 * 1
+  val xAxis = ApplicationView.MatrixSize
 
   val gridCell = initialGrid
 
-  var mouseIsPressed = false
-
-  def initialGrid() = ParArray.tabulate[ToggleButton](xAxis, xAxis) {
-    (x, y) =>
-      new ToggleButton {
-        name = s"$x:$y"
-        listenTo(mouse.clicks, mouse.moves)
-        // Add reactions when mouse events occurs
-        reactions += {
-          case e: MousePressed =>
-            if (SwingUtilities.isLeftMouseButton(e.peer)) { mouseIsPressed = true }
-          case e: MouseReleased =>
-            if (SwingUtilities.isLeftMouseButton(e.peer)) { mouseIsPressed = false }
-          case e: MouseEntered =>
-            if (mouseIsPressed) { selectButton(this) }
-          case e: MouseExited =>
-            if (mouseIsPressed) { selectButton(this) }
-        }
+    val gridPanel = new GridPanel(xAxis, xAxis) {
+      logger.info("Initializing grid layout...")
+      for {
+        x <- 0 until xAxis
+        y <- 0 until xAxis
+      } {
+        contents += gridCell(x)(y)
       }
-  }
-
-  def selectButton(toggle: ToggleButton) = toggle.selected = true
-
-  def gridCellRows() = gridCell.iterator.map(_.iterator)
-
-  val gridPanel = new GridPanel(xAxis, xAxis) {
-    println("Start grid layout")
-    for (
-      x <- 0 until xAxis;
-      y <- 0 until xAxis
-    ) {
-      contents += gridCell(x)(y)
-    }
   }
 
   val start = new Button {
@@ -124,6 +95,33 @@ class ApplicationView extends SimpleSwingApplication {
     layout(leftPanel) = West
   }
 
+  var generations = false
+
+  var mouseIsPressed = false
+
+  var generation = 0
+
+  def initialGrid() = ParArray.tabulate[ToggleButton](xAxis, xAxis) {
+    (x, y) =>
+      new ToggleButton {
+        name = s"$x:$y"
+        listenTo(mouse.clicks, mouse.moves)
+        // Add reactions when mouse events occurs
+        reactions += {
+          case e: MousePressed => 
+            mouseIsPressed = SwingUtilities.isLeftMouseButton(e.peer)
+          case e: MouseReleased =>
+            mouseIsPressed = !SwingUtilities.isLeftMouseButton(e.peer)
+          case e: MouseEntered =>
+            this.selected = mouseIsPressed
+          case e: MouseExited =>
+            this.selected = mouseIsPressed
+        }
+      }
+  }
+
+  def gridCellRows() = gridCell.iterator.map(_.iterator)
+
   def mod(x: Int, m: Int): Int = {
     val absoluteM = m.abs
     (x % absoluteM + absoluteM) % absoluteM
@@ -135,49 +133,50 @@ class ApplicationView extends SimpleSwingApplication {
     val ySize = xAxis
 
     if (gridCell(mod(x + 1, xSize))(y).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(mod(x + 1, xSize))(mod(y + 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(x)(mod(y + 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(x)(mod(y - 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(mod(x + 1, xSize))(mod(y - 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(mod(x - 1, xSize))(y).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(mod(x - 1, xSize))(mod(y - 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     if (gridCell(mod(x - 1, xSize))(mod(y + 1, ySize)).selected) {
-      neighborCount = neighborCount + 1
+      neighborCount += 1
     }
 
     neighborCount
   }
 
-  def getState(x: Int, y: Int): Boolean = {
-    gridCell(x)(y).selected && getNeighborCount(x, y) == 2 || getNeighborCount(x, y) == 3
-  }
+  def getState(x: Int, y: Int) = gridCell(x)(y).selected  && 
+                                 getNeighborCount(x, y) == 2 || 
+                                 getNeighborCount(x, y) == 3
+  
 
   val nextGridGeneration = initialGrid
 
   def top = new MainFrame {
-    println(UIManager.getLookAndFeel)
-    title = titleApp
+    logger.info(s"Look and feel used: ${UIManager.getLookAndFeel}")
+    title = ApplicationView.TitleApp
 
     contents = mainLayout
 
@@ -187,42 +186,43 @@ class ApplicationView extends SimpleSwingApplication {
 
     reactions += {
       case ButtonClicked(component) if component == start => {
-        println("Start clicked")
-        println(Thread.currentThread)
+        logger.info("Start button clicked")
         generations = true
         start.enabled = false
         clear.enabled = false
 
-        val startFuture: Future[Unit] = future {
-          println(s"Future started: ${Thread.currentThread}")
+        val startFuture: Future[Unit] = Future {
+          logger.info("Starting Future call...")
           while (generations) {
-            for (
-              x <- 0 until xAxis;
+            for {
+              x <- 0 until xAxis
               y <- 0 until xAxis
-            ) {
+            } {
               nextGridGeneration(x)(y).selected = getState(x, y)
             }
-            for (
-              x <- 0 until xAxis;
+            for {
+              x <- 0 until xAxis
               y <- 0 until xAxis
-            ) {
+            } {
               gridCell(x)(y).selected = nextGridGeneration(x)(y).selected
             }
-            Thread.sleep(seconds)
+            generation += 1
+            logger.info(s"New generation: $generation")
+            Thread.sleep(ApplicationView.TimeSleep)
           }
         }
         startFuture onSuccess {
-          case u => println("Future.onSuccess => Start stoped")
+          case u => logger.info("Future.onSuccess => Start action stopped") 
         }
       }
       case ButtonClicked(component) if component == stop => {
-        println("Stop clicked")
+        logger.info("Stop button clicked")
         generations = false
         start.enabled = true
         clear.enabled = true
       }
       case ButtonClicked(component) if component == clear => {
-        println("Clear clicked")
+        logger.info("Clear button clicked")
         gridCell.foreach {
           x =>
             x.foreach {
@@ -236,4 +236,16 @@ class ApplicationView extends SimpleSwingApplication {
     minimumSize = new Dimension(400, 300)
     pack
   }
+}
+
+
+object ApplicationView {
+
+  val TitleApp = "Conway's Game of Life :: juanitodread :: 2015"
+
+  val MatrixSize = 50
+
+  val TimeSleep = 1 * 100
+
+  def apply( ) = new ApplicationView( )
 }

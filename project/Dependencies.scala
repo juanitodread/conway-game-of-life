@@ -22,10 +22,16 @@ import sbt._
 object Dependencies {
 	// versions
 	lazy val scalaSwingVersion = "1.0.1"
+  lazy val scalaLoggingVersion = "3.1.0"
+  lazy val logbackVersion = "1.1.3"
 	
 	// libraries
 	val scalaSwing = "org.scala-lang.modules" %% "scala-swing" % scalaSwingVersion
+  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
+  val logback    = "ch.qos.logback" % "logback-classic" % logbackVersion
 
 	// projects 
-	val backendDeps = Seq(scalaSwing)
+	val backendDeps = Seq(scalaSwing, 
+                        scalaLogging,
+                        logback)
 }
