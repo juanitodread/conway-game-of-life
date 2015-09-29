@@ -15,4 +15,7 @@ lazy val root = (project in file(".")).
 			libraryDependencies ++= backendDeps
 		).settings(
 			scalacOptions += "-feature"	
+		).settings(
+			fork := true, // Enabling fork JVM to send the Java parameter that uses another sort algorithm
+			javaOptions ++= Seq("-Djava.util.Arrays.useLegacyMergeSort=true")
 		)
