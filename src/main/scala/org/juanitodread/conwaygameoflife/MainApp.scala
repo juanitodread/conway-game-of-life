@@ -26,7 +26,7 @@ import com.typesafe.scalalogging._
  * Main application. Instantiate the frame in a new Thread
  *
  * @author juanitodread
- * @version 1.0.0
+ * @version 1.1.2
  * @since 1.0.0
  *
  * Mar 23, 2015

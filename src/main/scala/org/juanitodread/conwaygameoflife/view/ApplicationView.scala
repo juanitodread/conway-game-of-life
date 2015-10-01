@@ -35,7 +35,7 @@ import com.typesafe.scalalogging._
  * This Frame represents a Conway's game of life interface.
  *
  * @author juanitodread
- * @version 1.0.2
+ * @version 1.1.2
  * @since 1.0.0
  *
  * Mar 23, 2015
@@ -117,14 +117,14 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
         listenTo(mouse.clicks, mouse.moves)
         // Add reactions when mouse events occurs
         reactions += {
-          case e: MousePressed => 
-            mouseIsPressed = SwingUtilities.isLeftMouseButton(e.peer)
+          case e: MousePressed =>
+            mouseIsPressed = SwingUtilities.isLeftMouseButton( e.peer )
           case e: MouseReleased =>
-            mouseIsPressed = !SwingUtilities.isLeftMouseButton(e.peer)
+            mouseIsPressed = !SwingUtilities.isLeftMouseButton( e.peer )
           case e: MouseEntered =>
-            this.selected = mouseIsPressed
+            if ( mouseIsPressed ) { this.selected = true }
           case e: MouseExited =>
-            this.selected = mouseIsPressed
+            if ( mouseIsPressed ) { this.selected = true }
         }
       }
   }
@@ -253,7 +253,7 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
 object ApplicationView {
 
-  val TitleApp = "Conway's Game of Life :: juanitodread :: 2015"
+  val TitleApp = "Conway's Game of Life - v1.1.2 :: juanitodread"
 
   val MatrixSize = 50
 
