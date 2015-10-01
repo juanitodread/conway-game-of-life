@@ -89,10 +89,19 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
     listenTo(start)
   }
-
+  
+  val generationsLabel = new Label{
+    text = "Generations: 0"
+  }
+  
+  val southPanel = new FlowPanel(FlowPanel.Alignment.Right)() {
+    contents += generationsLabel
+  }
+  
   val mainLayout = new BorderPanel {
     layout(gridPanel) = Center
     layout(leftPanel) = West
+    layout(southPanel) = South
   }
 
   var generations = false
@@ -208,6 +217,7 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
             }
             generation += 1
             logger.info(s"New generation: $generation")
+            generationsLabel.text = s"Generations: $generation"
             Thread.sleep(ApplicationView.TimeSleep)
           }
         }
@@ -223,6 +233,8 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
       }
       case ButtonClicked(component) if component == clear => {
         logger.info("Clear button clicked")
+        generation = 0
+        generationsLabel.text = s"Generations: $generation"
         gridCell.foreach {
           x =>
             x.foreach {
