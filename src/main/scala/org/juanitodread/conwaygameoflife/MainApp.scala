@@ -20,24 +20,26 @@ package org.juanitodread.conwaygameoflife
 
 import javax.swing.SwingUtilities
 import org.juanitodread.conwaygameoflife.view.ApplicationView
+import com.typesafe.scalalogging._
 
 /**
  * Main application. Instantiate the frame in a new Thread
  *
  * @author juanitodread
- * @version $
- * @since 1.0
+ * @version 1.0.0
+ * @since 1.0.0
  *
  * Mar 23, 2015
  */
-object MainApp {
+object MainApp extends LazyLogging {
 
-  def main( args: Array[ String ] ): Unit = {
-    SwingUtilities.invokeLater( new Runnable {
+  def main(args: Array[String]): Unit = {
+    SwingUtilities.invokeLater(new Runnable {
       def run {
-        val app = new ApplicationView
-        app.startup( args )
+        logger.info("Starting the application...")
+        ApplicationView().startup(args)
+        logger.info("Application started :D")
       }
-    } )
+    })
   }
 }
