@@ -34,14 +34,26 @@ import java.io.FileInputStream
  */
 object Util {
 
-  def binarySerialization(obj: Object, path: String) = {
-    val oos = new ObjectOutputStream(new FileOutputStream(path))
-    oos.writeObject(obj)
+  /**
+   * Simple binary serialization of objects
+   * 
+   * @param obj  The object to be stored.
+   * @param path The path of the file where the object will be stored.
+   */
+  def binarySerialization( obj: Object, path: String ) = {
+    val oos = new ObjectOutputStream( new FileOutputStream( path ) )
+    oos.writeObject( obj )
     oos.close
   }
-  
-  def binaryDeserialization(path: String) = {
-    val ois = new ObjectInputStream(new FileInputStream(path))
+
+  /**
+   * Simple binary deserialization of objects
+   * 
+   * @param path The path of the file where the object is stored.
+   * @return A new object instance.
+   */
+  def binaryDeserialization( path: String ) = {
+    val ois = new ObjectInputStream( new FileInputStream( path ) )
     ois.readObject
   }
   
