@@ -2,7 +2,7 @@
 
 This application allows you to play with the **Game of life of Conway**. It is writen in Scala and Swing.
 
-### Release 1.0.x
+### Release 1.1.x
 * **How to run**
   * **Run from sources**
     To run from sources you need *SBT*. Just go to the main directory and execute the code with SBT:
