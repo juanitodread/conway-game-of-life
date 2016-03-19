@@ -2,6 +2,10 @@
 
 This application allows you to play with the **Game of life of Conway**. It is writen in Scala and Swing.
 
+![alt tag](https://raw.githubusercontent.com/juanitodread/conway-game-of-life/master/wiki/img/cgl2.png)
+
+![alt tag](https://raw.githubusercontent.com/juanitodread/conway-game-of-life/master/wiki/img/cgl3.png)
+
 ### Release 1.1.x
 * **How to run**
   * **Run from sources**
@@ -28,3 +32,4 @@ This application allows you to play with the **Game of life of Conway**. It is w
   The *Start* button will run the process to start the generation process. This process will stop when the user clicks on the *Stop* button.
 
   The *Clear* button is just to initialize the grid with all cells in dead state.
+
