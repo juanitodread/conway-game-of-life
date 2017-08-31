@@ -28,12 +28,12 @@ package org.juanitodread.conwaygameoflife
  * Oct 20, 2015
  */
 trait ApplicationConstants {
-  val MessageBundle   = "org.juanitodread.conwaygameoflife.i18n.message"
-  
+  val MessageBundle = "org.juanitodread.conwaygameoflife.i18n.message"
+
   val MessageNotFound = "Text not found"
-  
-  val AppTitle        = "org.juanitodread.conwaygameoflife.title"
-  val AppVersion      = "org.juanitodread.conwaygameoflife.version"
-  val AppAuthor       = "org.juanitodread.conwaygameoflife.author"
-  
+
+  val AppTitle = "org.juanitodread.conwaygameoflife.title"
+  val AppVersion = "org.juanitodread.conwaygameoflife.version"
+  val AppAuthor = "org.juanitodread.conwaygameoflife.author"
+
 }

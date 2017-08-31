@@ -48,14 +48,14 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
   val gridCell = initialGrid
 
-    val gridPanel = new GridPanel(xAxis, xAxis) {
-      logger.info("Initializing grid layout...")
-      for {
-        x <- 0 until xAxis
-        y <- 0 until xAxis
-      } {
-        contents += gridCell(x)(y)
-      }
+  val gridPanel = new GridPanel(xAxis, xAxis) {
+    logger.info("Initializing grid layout...")
+    for {
+      x <- 0 until xAxis
+      y <- 0 until xAxis
+    } {
+      contents += gridCell(x)(y)
+    }
   }
 
   val start = new Button {
@@ -89,15 +89,15 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
     listenTo(start)
   }
-  
-  val generationsLabel = new Label{
+
+  val generationsLabel = new Label {
     text = "Generations: 0"
   }
-  
+
   val southPanel = new FlowPanel(FlowPanel.Alignment.Right)() {
     contents += generationsLabel
   }
-  
+
   val mainLayout = new BorderPanel {
     layout(gridPanel) = Center
     layout(leftPanel) = West
@@ -118,13 +118,13 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
         // Add reactions when mouse events occurs
         reactions += {
           case e: MousePressed =>
-            mouseIsPressed = SwingUtilities.isLeftMouseButton( e.peer )
+            mouseIsPressed = SwingUtilities.isLeftMouseButton(e.peer)
           case e: MouseReleased =>
-            mouseIsPressed = !SwingUtilities.isLeftMouseButton( e.peer )
+            mouseIsPressed = !SwingUtilities.isLeftMouseButton(e.peer)
           case e: MouseEntered =>
-            if ( mouseIsPressed ) { this.selected = true }
+            if (mouseIsPressed) { this.selected = true }
           case e: MouseExited =>
-            if ( mouseIsPressed ) { this.selected = true }
+            if (mouseIsPressed) { this.selected = true }
         }
       }
   }
@@ -176,10 +176,9 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
     neighborCount
   }
 
-  def getState(x: Int, y: Int) = gridCell(x)(y).selected  && 
-                                 getNeighborCount(x, y) == 2 || 
-                                 getNeighborCount(x, y) == 3
-  
+  def getState(x: Int, y: Int) = gridCell(x)(y).selected &&
+    getNeighborCount(x, y) == 2 ||
+    getNeighborCount(x, y) == 3
 
   val nextGridGeneration = initialGrid
 
@@ -222,7 +221,7 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
           }
         }
         startFuture onSuccess {
-          case u => logger.info("Future.onSuccess => Start action stopped") 
+          case u => logger.info("Future.onSuccess => Start action stopped")
         }
       }
       case ButtonClicked(component) if component == stop => {
@@ -250,7 +249,6 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
   }
 }
 
-
 object ApplicationView {
 
   val TitleApp = "Conway's Game of Life - v1.1.2 :: juanitodread"
@@ -259,5 +257,5 @@ object ApplicationView {
 
   val TimeSleep = 1 * 100
 
-  def apply( ) = new ApplicationView( )
+  def apply() = new ApplicationView()
 }

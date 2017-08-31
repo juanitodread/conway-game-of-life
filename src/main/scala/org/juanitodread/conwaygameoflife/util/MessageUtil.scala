@@ -36,11 +36,10 @@ import com.typesafe.scalalogging.LazyLogging
 object MessageUtil extends ApplicationConstants with LazyLogging {
   lazy val locale = Locale.getDefault
   lazy val messages = ResourceBundle.getBundle(MessageBundle, locale)
-  
-  
+
   def getMessage(key: String): String = Option(key) match {
     case Some(x) => messages.getString(x)
-    case None    => MessageNotFound
+    case None => MessageNotFound
   }
-  
+
 }
