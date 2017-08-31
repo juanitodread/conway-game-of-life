@@ -8,8 +8,7 @@ lazy val root = (project in file(".")).
 			name := "Conway's Game of Life",
 			version := "1.1.2",
 			organization := "org.juanitodread",
-			scalaVersion := "2.11.6",
-			scalaHome := Some(file("/opt/scala-sdk/scala-2.11.6/"))
+			scalaVersion := "2.11.8"
 		).
 		settings(
 			libraryDependencies ++= backendDeps
