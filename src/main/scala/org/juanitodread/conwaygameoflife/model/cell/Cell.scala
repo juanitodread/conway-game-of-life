@@ -1,6 +1,6 @@
 package org.juanitodread.conwaygameoflife.model.cell
 
-class Cell(state: State.Value = State.Dead) {
+class Cell(val state: State.Value = State.Dead) {
 
   def isAlive() = this.state == State.Alive
 
