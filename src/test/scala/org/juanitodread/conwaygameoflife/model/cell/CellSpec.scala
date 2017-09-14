@@ -1,10 +1,6 @@
 package org.juanitodread.conwaygameoflife.model.cell
 
 import org.juanitodread.conwaygameoflife.UnitSpec
-import org.juanitodread.conwaygameoflife.model.cell.{
-  Cell,
-  State
-}
 
 class CellSpec extends UnitSpec {
 

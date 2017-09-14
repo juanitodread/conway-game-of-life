@@ -1,7 +1,6 @@
 package org.juanitodread.conwaygameoflife.model
 
 import org.juanitodread.conwaygameoflife.UnitSpec
-import org.juanitodread.conwaygameoflife.model.Board
 import org.juanitodread.conwaygameoflife.model.cell.{
   Cell,
   State
@@ -21,13 +20,13 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
 
   "A Board" should "throw IllegalArgumentException if the provided size is less than 30" in {
     assertThrows[IllegalArgumentException] {
-      val board = Board(29)
+      Board(29)
     }
   }
 
   "A Board" should "throw IllegalArgumentException if the provided size is greather than 100" in {
     assertThrows[IllegalArgumentException] {
-      val board = Board(101)
+      Board(101)
     }
   }
 
@@ -88,90 +87,90 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
   "A Board" should "calculate how many alive neighbors a cell has" in {
     val board = Board()
 
-    var neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 0)
+    var neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 0)
 
     board.aliveCell(29, 29)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 1)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 1)
 
     board.aliveCell(29, 0)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 2)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 2)
 
     board.aliveCell(29, 1)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 3)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 3)
 
     board.aliveCell(0, 29)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 4)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 4)
 
     board.aliveCell(0, 1)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 5)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 5)
 
     board.aliveCell(1, 29)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 6)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 6)
 
     board.aliveCell(1, 0)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 7)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 7)
 
     board.aliveCell(1, 1)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 8)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 8)
 
     board.aliveCell(2, 2)
-    neighbords = board.countAliveNeighborsForCell(0, 0)
-    assert(neighbords === 8)
+    neighbors = board.countAliveNeighborsForCell(0, 0)
+    assert(neighbors === 8)
   }
 
   "A Board" should "calculate how many dead neighbors a cell has" in {
     val board = Board()
 
-    var neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 8)
+    var neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 8)
 
     board.aliveCell(29, 29)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 7)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 7)
 
     board.aliveCell(29, 0)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 6)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 6)
 
     board.aliveCell(29, 1)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 5)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 5)
 
     board.aliveCell(0, 29)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 4)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 4)
 
     board.aliveCell(0, 1)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 3)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 3)
 
     board.aliveCell(1, 29)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 2)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 2)
 
     board.aliveCell(1, 0)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 1)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 1)
 
     board.aliveCell(1, 1)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 0)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 0)
 
     board.aliveCell(2, 2)
-    neighbords = board.countDeadNeighborsForCell(0, 0)
-    assert(neighbords === 0)
+    neighbors = board.countDeadNeighborsForCell(0, 0)
+    assert(neighbors === 0)
   }
 
-  "A Board" should "determine if a cell should alive according its neighboars" in {
+  "A Board" should "determine if a cell should alive according its neighbors" in {
     val board = Board()
 
     assert(!board.cellShouldAlive(0, 0))
