@@ -1,6 +1,6 @@
 package org.juanitodread.conwaygameoflife.model.cell
 
-class Cell(val state: State.Value = State.Dead) {
+class Cell private (val id: String, val state: State.Value = State.Dead) {
 
   def isAlive() = this.state == State.Alive
 
@@ -13,6 +13,8 @@ class Cell(val state: State.Value = State.Dead) {
 }
 
 object Cell {
-  def apply() = new Cell()
-  def apply(state: State.Value) = new Cell(state)
+  def apply(row: Int, col: Int) = new Cell(makeId(row, col))
+  def apply(row: Int, col: Int, state: State.Value) = new Cell(makeId(row, col), state)
+
+  private def makeId(row: Int, col: Int) = s"$row:$col"
 }
