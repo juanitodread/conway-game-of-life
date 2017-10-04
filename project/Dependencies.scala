@@ -24,14 +24,17 @@ object Dependencies {
 	lazy val scalaSwingVersion = "1.0.1"
   lazy val scalaLoggingVersion = "3.1.0"
   lazy val logbackVersion = "1.1.3"
+  lazy val scalaTestVersion = "3.0.1"
 	
 	// libraries
 	val scalaSwing = "org.scala-lang.modules" %% "scala-swing" % scalaSwingVersion
   val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
   val logback    = "ch.qos.logback" % "logback-classic" % logbackVersion
+  val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 
 	// projects 
 	val backendDeps = Seq(scalaSwing, 
                         scalaLogging,
-                        logback)
+                        logback,
+                        scalaTest)
 }
