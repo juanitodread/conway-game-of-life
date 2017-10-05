@@ -161,6 +161,22 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
 
     title = ApplicationView.TitleApp
 
+    menuBar = new MenuBar {
+      contents += new Menu("File") {
+        contents += new MenuItem(Action("Open") {
+          logger.info("Click on Open menu")
+        })
+        contents += new MenuItem(Action("Save") {
+          logger.info("Click on Save menu")
+        })
+      }
+      contents += new Menu("Help") {
+        contents += new MenuItem(Action("About") {
+          logger.info("Click on About menu")
+        })
+      }
+    }
+
     contents = mainPanel
 
     listenTo(leftPanel.startBtn)
