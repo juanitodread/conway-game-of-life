@@ -7,7 +7,8 @@ import org.juanitodread.conwaygameoflife.model.cell.{
   State
 }
 
-class Board(val size: Int = Board.MinSize) {
+@SerialVersionUID(1L)
+class Board(val size: Int = Board.MinSize) extends Serializable {
   require(size >= Board.MinSize && size <= Board.MaxSize)
 
   private var board = createBoard()

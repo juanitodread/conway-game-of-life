@@ -40,7 +40,7 @@ object Util {
    * @param obj  The object to be stored.
    * @param path The path of the file where the object will be stored.
    */
-  def binarySerialization(obj: Object, path: String) = {
+  def binarySerialization(obj: Object, path: String): Unit = {
     val oos = new ObjectOutputStream(new FileOutputStream(path))
     oos.writeObject(obj)
     oos.close
@@ -54,7 +54,9 @@ object Util {
    */
   def binaryDeserialization(path: String) = {
     val ois = new ObjectInputStream(new FileInputStream(path))
-    ois.readObject
+    val obj = ois.readObject
+    ois.close()
+    obj
   }
 
 }

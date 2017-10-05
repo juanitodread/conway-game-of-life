@@ -1,6 +1,7 @@
 package org.juanitodread.conwaygameoflife.model.cell
 
-class Cell private (val id: String, val state: State.Value = State.Dead) {
+@SerialVersionUID(1L)
+class Cell private (val id: String, val state: State.Value = State.Dead) extends Serializable {
 
   def isAlive() = this.state == State.Alive
 
