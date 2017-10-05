@@ -1,6 +1,7 @@
 package org.juanitodread.conwaygameoflife.model
 
 import scala.collection.mutable.ArrayBuffer
+
 import org.juanitodread.conwaygameoflife.model.cell.{
   Cell,
   State
@@ -9,25 +10,25 @@ import org.juanitodread.conwaygameoflife.model.cell.{
 class Board(val size: Int = Board.MinSize) {
   require(size >= Board.MinSize && size <= Board.MaxSize)
 
-  private val board = ArrayBuffer.fill(size, size)(Cell())
+  private var board = createBoard()
+
+  def reset(): Unit = {
+    board = createBoard()
+  }
 
   def cellAt(row: Int, col: Int): Cell = {
     require(isValidCellPosition(row, col))
-    val state = board(row)(col).isDead match {
-      case true => State.Dead
-      case false => State.Alive
-    }
-    Cell(state)
+    Cell(row, col, board(row)(col).state)
   }
 
   def aliveCell(row: Int, col: Int): Unit = {
     require(isValidCellPosition(row, col))
-    board(row)(col) = Cell(State.Alive)
+    board(row)(col) = Cell(row, col, State.Alive)
   }
 
   def deadCell(row: Int, col: Int): Unit = {
     require(isValidCellPosition(row, col))
-    board(row)(col) = Cell(State.Dead)
+    board(row)(col) = Cell(row, col, State.Dead)
   }
 
   def countAliveNeighborsForCell(row: Int, col: Int): Int = {
@@ -43,19 +44,18 @@ class Board(val size: Int = Board.MinSize) {
   def calculateCellState(row: Int, col: Int): State.Value = {
     require(isValidCellPosition(row, col))
     val currentCell = this.cellAt(row, col)
-    (currentCell.isAlive, this.cellShouldAlive(row, col)) match {
-      case (true, true) => State.Alive
+    (currentCell.isAlive, this.countAliveNeighborsForCell(row, col)) match {
+      case (true, 2) => State.Alive
+      case (_, 3) => State.Alive
       case _ => State.Dead
     }
-  }
-
-  def cellShouldAlive(row: Int, col: Int): Boolean = {
-    Board.ValidNeighborsCount.contains(this.countAliveNeighborsForCell(row, col))
   }
 
   override def toString(): String = {
     board.map(row => row.mkString(",")).mkString("\n")
   }
+
+  private def createBoard() = ArrayBuffer.tabulate(size, size)(Cell(_, _))
 
   private def isValidCellPosition(row: Int, col: Int): Boolean = {
     row >= 0 && row < this.size && col >= 0 && col < this.size
@@ -86,7 +86,6 @@ object Board {
   // $COVERAGE-OFF$
   private final val MinSize = 30
   private final val MaxSize = 100
-  private final val ValidNeighborsCount = List(2, 3)
   // $COVERAGE-ON$
 
   def apply() = new Board()

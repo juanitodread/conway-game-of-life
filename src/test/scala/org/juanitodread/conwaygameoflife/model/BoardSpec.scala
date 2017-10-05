@@ -170,24 +170,6 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
     assert(neighbors === 0)
   }
 
-  "A Board" should "determine if a cell should alive according its neighbors" in {
-    val board = Board()
-
-    assert(!board.cellShouldAlive(0, 0))
-
-    board.aliveCell(0, 1)
-    assert(!board.cellShouldAlive(0, 0))
-
-    board.aliveCell(1, 0)
-    assert(board.cellShouldAlive(0, 0))
-
-    board.aliveCell(1, 1)
-    assert(board.cellShouldAlive(0, 0))
-
-    board.aliveCell(29, 29)
-    assert(!board.cellShouldAlive(0, 0))
-  }
-
   "A Board" should "calculate the new state of a Cell" in {
     val board = Board()
     board.aliveCell(0, 0)
@@ -203,5 +185,7 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
     board.aliveCell(29, 29)
     assert(board.calculateCellState(0, 0) === State.Dead)
   }
+
+  "A Board of" should ""
 
 }

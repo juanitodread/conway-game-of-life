@@ -29,9 +29,40 @@ class CellSpec extends UnitSpec {
     assert(cell.isAlive)
   }
 
-  "A Cell with id (0,0)" should "return the string '0:0' as id " in {
+  "A Cell with id (0,0)" should "return the string '0:0' as id" in {
     val cell = Cell(0, 0, State.Alive)
     assert(cell.id === "0:0")
+  }
+
+  "A Cell object" should "create an id according row and col parameters" in {
+    var (row, col) = (3, 4)
+    assert(Cell.makeId(row, col) === "3:4")
+
+    row = -3
+    col = -4
+    assert(Cell.makeId(row, col) === "-3:-4")
+  }
+
+  "A Cell object" should "parse a valid id and return row and col values" in {
+    val id = "3:4"
+    val (row, col) = Cell.parseId(id)
+
+    assert(row === 3)
+    assert(col === 4)
+  }
+
+  "A Cell object" should "parse an id with multiple delimiters and throw IllegalArgumentException" in {
+    assertThrows[IllegalArgumentException] {
+      val id = "3:4:3"
+      val (row, col) = Cell.parseId(id)
+    }
+  }
+
+  "A Cell object" should "parse a non numeric id and throw IllegalArgumentException" in {
+    assertThrows[IllegalArgumentException] {
+      val id = "you:me"
+      val (row, col) = Cell.parseId(id)
+    }
   }
 
 }
