@@ -186,6 +186,4 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
     assert(board.calculateCellState(0, 0) === State.Dead)
   }
 
-  "A Board of" should ""
-
 }

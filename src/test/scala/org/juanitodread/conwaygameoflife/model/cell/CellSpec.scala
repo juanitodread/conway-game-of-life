@@ -61,7 +61,7 @@ class CellSpec extends UnitSpec {
   "A Cell object" should "parse a non numeric id and throw IllegalArgumentException" in {
     assertThrows[IllegalArgumentException] {
       val id = "you:me"
-      val (row, col) = Cell.parseId(id)
+      Cell.parseId(id)
     }
   }
 
