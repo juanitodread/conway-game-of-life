@@ -36,6 +36,8 @@ import org.juanitodread.conwaygameoflife.model.cell.{
   State
 }
 
+import scala.language.reflectiveCalls
+
 import ExecutionContext.Implicits.global
 
 /**
@@ -201,8 +203,8 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
             Thread.sleep(ApplicationView.TimeSleep)
           }
         }
-        startFuture onSuccess {
-          case _ => logger.info("Future.onSuccess => Start action stopped")
+        startFuture onComplete {
+          case _ => logger.info("Future.onComplete => Start action stopped")
         }
       }
       case ButtonClicked(component) if component == leftPanel.stopBtn => {
