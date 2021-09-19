@@ -19,8 +19,9 @@
 package org.juanitodread.conwaygameoflife
 
 import javax.swing.SwingUtilities
-import org.juanitodread.conwaygameoflife.view.ApplicationView
 import com.typesafe.scalalogging._
+
+import org.juanitodread.conwaygameoflife.view.ApplicationView
 
 /**
  * Main application. Instantiate the frame in a new Thread

@@ -18,18 +18,27 @@
  */
 package org.juanitodread.conwaygameoflife.view
 
-import javax.swing.SwingUtilities
-import javax.swing.UIManager
+import javax.swing.{
+  SwingUtilities,
+  UIManager
+}
 
 import scala.swing._
 import scala.swing.BorderPanel.Position._
 import scala.swing.event._
 import scala.concurrent._
-import ExecutionContext.Implicits.global
-
-import scala.collection.parallel.mutable.ParArray
 
 import com.typesafe.scalalogging._
+
+import org.juanitodread.conwaygameoflife.model.Board
+import org.juanitodread.conwaygameoflife.model.cell.{
+  Cell,
+  State
+}
+
+import scala.language.reflectiveCalls
+
+import ExecutionContext.Implicits.global
 
 /**
  * This Frame represents a Conway's game of life interface.
@@ -40,206 +49,178 @@ import com.typesafe.scalalogging._
  *
  * Mar 23, 2015
  */
-class ApplicationView extends SimpleSwingApplication with LazyLogging {
+class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with LazyLogging {
 
   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
 
-  val xAxis = ApplicationView.MatrixSize
+  private[this] val state = Board(boardSize)
+  val graphicBoard = buildGraphicBoard(state)
 
-  val gridCell = initialGrid
+  // State functions
 
-  val gridPanel = new GridPanel(xAxis, xAxis) {
-    logger.info("Initializing grid layout...")
-    for {
-      x <- 0 until xAxis
-      y <- 0 until xAxis
-    } {
-      contents += gridCell(x)(y)
+  /**
+   * Refresh the graphic board according to the given state. If the state has
+   * alive cells then the graphic board paint them as alive cell.
+   *
+   * @param state The state of the board.
+   */
+  def refreshGraphicBoard(state: Board): Unit = {
+    logger.debug("Refreshing graphic board according state")
+
+    graphicBoard.contents.foreach { content =>
+      val graphicCell = content.asInstanceOf[ToggleButton]
+      val (row, col) = Cell.parseId(graphicCell.name)
+      graphicCell.selected = state.cellAt(row, col).isAlive()
     }
   }
 
-  val start = new Button {
-    text = "Start"
+  /**
+   * Refresh the state of the application according to the user input (state of the graphic board).
+   *
+   * @param graphicBoard The graphic board (the view)
+   */
+  def refreshState(graphicBoard: GridPanel): Unit = {
+    logger.debug("Refreshing state based on graphic board")
+
+    graphicBoard.contents.foreach { content =>
+      val graphicCell = content.asInstanceOf[ToggleButton]
+      val (row, col) = Cell.parseId(graphicCell.name)
+
+      if (graphicCell.selected) {
+        state.aliveCell(row, col)
+      } else {
+        state.deadCell(row, col)
+      }
+    }
   }
 
-  val stop = new Button {
-    text = "Stop"
+  private[this] def buildCellGraphicBoard(id: String): ToggleButton = {
+    logger.debug(s"Building a graphic cell with id: $id")
+
+    new ToggleButton {
+      name = id
+      listenTo(mouse.clicks, mouse.moves)
+
+      reactions += {
+        case e: MousePressed =>
+          mouseIsPressed = SwingUtilities.isLeftMouseButton(e.peer)
+        case e: MouseReleased =>
+          mouseIsPressed = !SwingUtilities.isLeftMouseButton(e.peer)
+        case _: MouseEntered | _: MouseExited =>
+          if (mouseIsPressed) { this.selected = true }
+      }
+    }
   }
 
-  val clear = new Button {
-    text = "Clear"
+  private[this] def buildGraphicBoard(state: Board): GridPanel = {
+    logger.debug(s"Building graphic board of size: ${state.size}")
+
+    new GridPanel(state.size, state.size) {
+      for {
+        row <- 0 until state.size
+        col <- 0 until state.size
+      } {
+        contents += buildCellGraphicBoard(Cell.makeId(row, col))
+      }
+    }
   }
 
-  val buttonMinSize = new Dimension(70, 25)
-  val buttonMaxSize = new Dimension(70, 25)
-  val boxPanelSize = new Dimension(75, 600)
+  // Graphics
+  var mouseIsPressed = false
 
+  //   Panels
   val leftPanel = new BoxPanel(Orientation.Vertical) {
-    preferredSize = boxPanelSize
+    preferredSize = new Dimension(75, 600)
     border = Swing.EmptyBorder(5, 5, 0, 0)
-    contents += start
-    contents += stop
-    contents += clear
 
-    contents.foreach {
-      x =>
-        x.maximumSize = buttonMaxSize
-        x.minimumSize = buttonMinSize
-    }
+    val startBtn = ApplicationView.buildButton("start", "Start")
+    val stopBtn = ApplicationView.buildButton("stop", "Stop")
+    val clearBtn = ApplicationView.buildButton("clear", "Clear")
 
-    listenTo(start)
-  }
-
-  val generationsLabel = new Label {
-    text = "Generations: 0"
+    contents += startBtn
+    contents += stopBtn
+    contents += clearBtn
   }
 
   val southPanel = new FlowPanel(FlowPanel.Alignment.Right)() {
-    contents += generationsLabel
+    val generations = new Label {
+      text = "Generations: 0"
+    }
+    contents += generations
   }
 
-  val mainLayout = new BorderPanel {
-    layout(gridPanel) = Center
+  val mainPanel = new BorderPanel {
+    layout(graphicBoard) = Center
     layout(leftPanel) = West
     layout(southPanel) = South
   }
 
-  var generations = false
-
-  var mouseIsPressed = false
-
-  var generation = 0
-
-  def initialGrid() = ParArray.tabulate[ToggleButton](xAxis, xAxis) {
-    (x, y) =>
-      new ToggleButton {
-        name = s"$x:$y"
-        listenTo(mouse.clicks, mouse.moves)
-        // Add reactions when mouse events occurs
-        reactions += {
-          case e: MousePressed =>
-            mouseIsPressed = SwingUtilities.isLeftMouseButton(e.peer)
-          case e: MouseReleased =>
-            mouseIsPressed = !SwingUtilities.isLeftMouseButton(e.peer)
-          case e: MouseEntered =>
-            if (mouseIsPressed) { this.selected = true }
-          case e: MouseExited =>
-            if (mouseIsPressed) { this.selected = true }
-        }
-      }
-  }
-
-  def gridCellRows() = gridCell.iterator.map(_.iterator)
-
-  def mod(x: Int, m: Int): Int = {
-    val absoluteM = m.abs
-    (x % absoluteM + absoluteM) % absoluteM
-  }
-
-  def getNeighborCount(x: Int, y: Int): Int = {
-    var neighborCount = 0
-    val xSize = xAxis
-    val ySize = xAxis
-
-    if (gridCell(mod(x + 1, xSize))(y).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(mod(x + 1, xSize))(mod(y + 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(x)(mod(y + 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(x)(mod(y - 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(mod(x + 1, xSize))(mod(y - 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(mod(x - 1, xSize))(y).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(mod(x - 1, xSize))(mod(y - 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    if (gridCell(mod(x - 1, xSize))(mod(y + 1, ySize)).selected) {
-      neighborCount += 1
-    }
-
-    neighborCount
-  }
-
-  def getState(x: Int, y: Int) = gridCell(x)(y).selected &&
-    getNeighborCount(x, y) == 2 ||
-    getNeighborCount(x, y) == 3
-
-  val nextGridGeneration = initialGrid
-
+  //    Frame
   def top = new MainFrame {
     logger.info(s"Look and feel used: ${UIManager.getLookAndFeel}")
+    var running = false
+    var generation = 0
+
     title = ApplicationView.TitleApp
 
-    contents = mainLayout
+    contents = mainPanel
 
-    listenTo(start)
-    listenTo(stop)
-    listenTo(clear)
+    listenTo(leftPanel.startBtn)
+    listenTo(leftPanel.stopBtn)
+    listenTo(leftPanel.clearBtn)
 
     reactions += {
-      case ButtonClicked(component) if component == start => {
+      case ButtonClicked(component) if component == leftPanel.startBtn => {
         logger.info("Start button clicked")
-        generations = true
-        start.enabled = false
-        clear.enabled = false
+
+        running = true
+        leftPanel.startBtn.enabled = false
+        leftPanel.clearBtn.enabled = false
 
         val startFuture: Future[Unit] = Future {
           logger.info("Starting Future call...")
-          while (generations) {
+
+          while (running) {
+            val nextState = Board(state.size)
+            refreshState(graphicBoard)
+
             for {
-              x <- 0 until xAxis
-              y <- 0 until xAxis
+              row <- 0 until state.size
+              col <- 0 until state.size
             } {
-              nextGridGeneration(x)(y).selected = getState(x, y)
+              if (state.calculateCellState(row, col) == State.Alive) {
+                nextState.aliveCell(row, col)
+              } else {
+                nextState.deadCell(row, col)
+              }
             }
-            for {
-              x <- 0 until xAxis
-              y <- 0 until xAxis
-            } {
-              gridCell(x)(y).selected = nextGridGeneration(x)(y).selected
-            }
+
+            refreshGraphicBoard(nextState)
             generation += 1
-            logger.info(s"New generation: $generation")
-            generationsLabel.text = s"Generations: $generation"
+            southPanel.generations.text = s"Generations: $generation"
+
+            logger.info(southPanel.generations.text)
             Thread.sleep(ApplicationView.TimeSleep)
           }
         }
-        startFuture onSuccess {
-          case u => logger.info("Future.onSuccess => Start action stopped")
+        startFuture onComplete {
+          case _ => logger.info("Future.onComplete => Start action stopped")
         }
       }
-      case ButtonClicked(component) if component == stop => {
+      case ButtonClicked(component) if component == leftPanel.stopBtn => {
         logger.info("Stop button clicked")
-        generations = false
-        start.enabled = true
-        clear.enabled = true
+
+        running = false
+        leftPanel.startBtn.enabled = true
+        leftPanel.clearBtn.enabled = true
       }
-      case ButtonClicked(component) if component == clear => {
+      case ButtonClicked(component) if component == leftPanel.clearBtn => {
         logger.info("Clear button clicked")
+
         generation = 0
-        generationsLabel.text = s"Generations: $generation"
-        gridCell.foreach {
-          x =>
-            x.foreach {
-              y => y.selected = false
-            }
-        }
+        southPanel.generations.text = s"Generations: $generation"
+        state.reset()
+        refreshGraphicBoard(state)
       }
     }
     size = new Dimension(800, 600)
@@ -251,11 +232,18 @@ class ApplicationView extends SimpleSwingApplication with LazyLogging {
 
 object ApplicationView {
 
-  val TitleApp = "Conway's Game of Life - v1.1.2 :: juanitodread"
+  final val TitleApp = "Conway's Game of Life"
+  final val DefaultBoardSize = 50
+  final val TimeSleep = 1 * 100
 
-  val MatrixSize = 50
+  def apply(size: Int = DefaultBoardSize) = new ApplicationView(size)
 
-  val TimeSleep = 1 * 100
-
-  def apply() = new ApplicationView()
+  private def buildButton(id: String, label: String): Button = {
+    new Button {
+      name = id
+      text = label
+      maximumSize = new Dimension(70, 25)
+      minimumSize = maximumSize
+    }
+  }
 }
