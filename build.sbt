@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test",
 )
 
-scalacOptions += "-feature"
+scalacOptions ++= List("-feature", "-deprecation")
 
 fork := true // Enabling fork JVM to send the Java parameter that uses another sort algorithm
 javaOptions ++= Seq("-Djava.util.Arrays.useLegacyMergeSort=true")
