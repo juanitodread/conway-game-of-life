@@ -44,7 +44,7 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
       row <- 0 until size;
       col <- 0 until size
     ) {
-      assert(board.cellAt(row, col).isDead)
+      assert(board.cellAt(row, col).isDead())
     }
   }
 
@@ -54,7 +54,7 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
     board.deadCell(0, 0)
     val newCell = board.cellAt(0, 0)
     assert(oldCell !== newCell)
-    assert(newCell.isDead)
+    assert(newCell.isDead())
   }
 
   "A Board" should "create a new Alive Cell at the position [0,0]" in {
@@ -63,7 +63,7 @@ class BoardSpec extends UnitSpec with BoardSpecConstants {
     board.aliveCell(0, 0)
     val newCell = board.cellAt(0, 0)
     assert(oldCell !== newCell)
-    assert(newCell.isAlive)
+    assert(newCell.isAlive())
   }
 
   "A Default Board" should "return a String grid of size 30 with o's" in {
