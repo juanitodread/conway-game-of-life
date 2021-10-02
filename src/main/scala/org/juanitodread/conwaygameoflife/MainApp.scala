@@ -37,7 +37,7 @@ object MainApp extends LazyLogging {
   def main(args: Array[String]): Unit = {
     SwingUtilities.invokeLater(new Runnable {
       def run {
-        logger.info("Starting the application...")
+        logger.info("Starting application...")
         ApplicationView().startup(args)
         logger.info("Application started :D")
       }
