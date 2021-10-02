@@ -136,10 +136,13 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
     val startBtn = ApplicationView.buildButton("start", "Start")
     val stopBtn = ApplicationView.buildButton("stop", "Stop")
     val clearBtn = ApplicationView.buildButton("clear", "Clear")
+    val aboutBtn = ApplicationView.buildButton("about", "About")
 
-    contents += startBtn
-    contents += stopBtn
-    contents += clearBtn
+    contents ++= List(
+      startBtn,
+      stopBtn,
+      clearBtn,
+      aboutBtn)
   }
 
   val southPanel = new FlowPanel(FlowPanel.Alignment.Right)() {
@@ -168,6 +171,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
     listenTo(leftPanel.startBtn)
     listenTo(leftPanel.stopBtn)
     listenTo(leftPanel.clearBtn)
+    listenTo(leftPanel.aboutBtn)
 
     reactions += {
       case ButtonClicked(component) if component == leftPanel.startBtn => {
@@ -176,6 +180,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
         running = true
         leftPanel.startBtn.enabled = false
         leftPanel.clearBtn.enabled = false
+        leftPanel.aboutBtn.enabled = false
 
         val startFuture: Future[Unit] = Future {
           logger.info("Starting Future call...")
@@ -213,6 +218,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
         running = false
         leftPanel.startBtn.enabled = true
         leftPanel.clearBtn.enabled = true
+        leftPanel.aboutBtn.enabled = true
       }
       case ButtonClicked(component) if component == leftPanel.clearBtn => {
         logger.info("Clear button clicked")
@@ -221,6 +227,11 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
         southPanel.generations.text = s"Generations: $generation"
         state.reset()
         refreshGraphicBoard(state)
+      }
+      case ButtonClicked(component) if component == leftPanel.aboutBtn => {
+        logger.info("About button clicked")
+
+        Dialog.showMessage(this, "Conway's game of life in Scala\n\n@juanitodread - 2015 - v1.2.0")
       }
     }
     size = new Dimension(800, 600)
