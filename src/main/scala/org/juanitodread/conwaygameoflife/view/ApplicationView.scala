@@ -228,7 +228,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
     size = new Dimension(800, 600)
     preferredSize = new Dimension(800, 600)
     minimumSize = new Dimension(400, 300)
-    pack
+    pack()
   }
 }
 
