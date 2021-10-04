@@ -44,7 +44,7 @@ class Board(val size: Int = Board.MinSize) {
   def calculateCellState(row: Int, col: Int): State.Value = {
     require(isValidCellPosition(row, col))
     val currentCell = this.cellAt(row, col)
-    (currentCell.isAlive, this.countAliveNeighborsForCell(row, col)) match {
+    (currentCell.isAlive(), this.countAliveNeighborsForCell(row, col)) match {
       case (true, 2) => State.Alive
       case (_, 3) => State.Alive
       case _ => State.Dead

@@ -6,7 +6,7 @@ class CellSpec extends UnitSpec {
 
   "A Cell" should "be created with a default dead state" in {
     val cell = Cell(0, 0)
-    assert(cell.isDead)
+    assert(cell.isDead())
   }
 
   "A Dead Cell" should "have toString method equals to \"o\"" in {
@@ -16,7 +16,7 @@ class CellSpec extends UnitSpec {
 
   "A Dead Cell" should "return true for isDead() method" in {
     val cell = Cell(0, 0, State.Dead)
-    assert(cell.isDead)
+    assert(cell.isDead())
   }
 
   "An Alive Cell" should "have toString method equals to \"x\"" in {
@@ -26,7 +26,7 @@ class CellSpec extends UnitSpec {
 
   "An Alive Cell" should "return true for isAlive() method" in {
     val cell = Cell(0, 0, State.Alive)
-    assert(cell.isAlive)
+    assert(cell.isAlive())
   }
 
   "A Cell with id (0,0)" should "return the string '0:0' as id" in {
