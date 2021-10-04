@@ -18,26 +18,17 @@
  */
 package org.juanitodread.conwaygameoflife.view
 
-import javax.swing.{
-  SwingUtilities,
-  UIManager
-}
-
+import javax.swing.{ SwingUtilities, UIManager }
 import scala.swing._
 import scala.swing.BorderPanel.Position._
 import scala.swing.event._
 import scala.concurrent._
-
 import com.typesafe.scalalogging._
-
 import org.juanitodread.conwaygameoflife.model.Board
-import org.juanitodread.conwaygameoflife.model.cell.{
-  Cell,
-  State
-}
+import org.juanitodread.conwaygameoflife.model.cell.{ Cell, State }
+import org.juanitodread.conwaygameoflife.util.Messages
 
 import scala.language.reflectiveCalls
-
 import ExecutionContext.Implicits.global
 
 /**
@@ -130,13 +121,13 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
 
   //   Panels
   val leftPanel = new BoxPanel(Orientation.Vertical) {
-    preferredSize = new Dimension(75, 600)
+    preferredSize = new Dimension(100, 600)
     border = Swing.EmptyBorder(5, 5, 0, 0)
 
-    val startBtn = ApplicationView.buildButton("start", "Start")
-    val stopBtn = ApplicationView.buildButton("stop", "Stop")
-    val clearBtn = ApplicationView.buildButton("clear", "Clear")
-    val aboutBtn = ApplicationView.buildButton("about", "About")
+    val startBtn = ApplicationView.buildButton("start", Messages.StartButton)
+    val stopBtn = ApplicationView.buildButton("stop", Messages.StopButton)
+    val clearBtn = ApplicationView.buildButton("clear", Messages.ClearButton)
+    val aboutBtn = ApplicationView.buildButton("about", Messages.AboutButton)
 
     contents ++= List(
       startBtn,
@@ -147,7 +138,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
 
   val southPanel = new FlowPanel(FlowPanel.Alignment.Right)() {
     val generations = new Label {
-      text = "Generations: 0"
+      text = s"${Messages.GenerationsLabel}: 0"
     }
     contents += generations
   }
@@ -164,7 +155,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
     var running = false
     var generation = 0
 
-    title = ApplicationView.TitleApp
+    title = Messages.AppFullTitle
 
     contents = mainPanel
 
@@ -202,7 +193,7 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
 
             refreshGraphicBoard(nextState)
             generation += 1
-            southPanel.generations.text = s"Generations: $generation"
+            southPanel.generations.text = s"${Messages.GenerationsLabel}: ${generation}"
 
             logger.info(southPanel.generations.text)
             Thread.sleep(ApplicationView.TimeSleep)
@@ -224,14 +215,14 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
         logger.info("Clear button clicked")
 
         generation = 0
-        southPanel.generations.text = s"Generations: $generation"
+        southPanel.generations.text = s"${Messages.GenerationsLabel}: ${generation}"
         state.reset()
         refreshGraphicBoard(state)
       }
       case ButtonClicked(component) if component == leftPanel.aboutBtn => {
         logger.info("About button clicked")
 
-        Dialog.showMessage(this, "Conway's game of life in Scala\n\n@juanitodread - 2015 - v1.2.0")
+        Dialog.showMessage(this, Messages.AboutDialog, Messages.AboutButton)
       }
     }
     size = new Dimension(800, 600)
@@ -242,8 +233,6 @@ class ApplicationView(val boardSize: Int) extends SimpleSwingApplication with La
 }
 
 object ApplicationView {
-
-  final val TitleApp = "Conway's Game of Life"
   final val DefaultBoardSize = 50
   final val TimeSleep = 1 * 100
 
@@ -253,7 +242,7 @@ object ApplicationView {
     new Button {
       name = id
       text = label
-      maximumSize = new Dimension(70, 25)
+      maximumSize = new Dimension(100, 25)
       minimumSize = maximumSize
     }
   }

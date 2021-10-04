@@ -35,5 +35,14 @@ trait ApplicationConstants {
   val AppTitle = "org.juanitodread.conwaygameoflife.title"
   val AppVersion = "org.juanitodread.conwaygameoflife.version"
   val AppAuthor = "org.juanitodread.conwaygameoflife.author"
+  val AppYear = "org.juanitodread.conwaygameoflife.year"
 
+  val StartButton = "org.juanitodread.conwaygameoflife.view.startBtn"
+  val StopButton = "org.juanitodread.conwaygameoflife.view.stopBtn"
+  val ClearButton = "org.juanitodread.conwaygameoflife.view.clearBtn"
+  val AboutButton = "org.juanitodread.conwaygameoflife.view.aboutBtn"
+
+  val GenerationsLabel = "org.juanitodread.conwaygameoflife.view.generationsLbl"
+
+  val AboutDialog = "org.juanitodread.conwaygameoflife.view.aboutDialog"
 }

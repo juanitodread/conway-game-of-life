@@ -41,5 +41,21 @@ object MessageUtil extends ApplicationConstants with LazyLogging {
     case Some(x) => messages.getString(x)
     case None => MessageNotFound
   }
+}
 
+object Messages {
+  final val AppTitle = MessageUtil.getMessage(MessageUtil.AppTitle)
+  final val AppVersion = MessageUtil.getMessage(MessageUtil.AppVersion)
+  final val AppAuthor = MessageUtil.getMessage(MessageUtil.AppAuthor)
+  final val AppYear = MessageUtil.getMessage(MessageUtil.AppYear)
+
+  final val StartButton = MessageUtil.getMessage(MessageUtil.StartButton)
+  final val StopButton = MessageUtil.getMessage(MessageUtil.StopButton)
+  final val ClearButton = MessageUtil.getMessage(MessageUtil.ClearButton)
+  final val AboutButton = MessageUtil.getMessage(MessageUtil.AboutButton)
+
+  final val GenerationsLabel = MessageUtil.getMessage(MessageUtil.GenerationsLabel)
+
+  final val AboutDialog = s"${Messages.AppTitle} - ${Messages.AppVersion}\n\n${Messages.AppAuthor} - ${Messages.AppYear}"
+  final val AppFullTitle = s"${Messages.AppTitle} - ${Messages.AppVersion}"
 }
